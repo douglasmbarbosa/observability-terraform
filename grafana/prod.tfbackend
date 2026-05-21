@@ -1,0 +1,4 @@
+bucket  = "your-terraform-state-bucket-prod"
+key     = "grafana/prod/terraform.tfstate"
+region  = "us-east-1"
+profile = "my-aws-profile-prod"

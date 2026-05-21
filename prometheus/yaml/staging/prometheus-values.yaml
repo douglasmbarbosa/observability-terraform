@@ -1,0 +1,14 @@
+server:
+  persistentVolume:
+    enabled: true
+    existingClaim: "prometheus-efs-pvc-staging"
+
+  retention: "15d"
+
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi

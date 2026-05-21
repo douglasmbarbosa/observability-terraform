@@ -1,0 +1,4 @@
+bucket  = "your-terraform-state-bucket-dev"
+key     = "prometheus/dev/terraform.tfstate"
+region  = "us-east-1"
+profile = "my-aws-profile-dev"

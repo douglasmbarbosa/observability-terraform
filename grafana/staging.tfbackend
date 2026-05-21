@@ -1,0 +1,4 @@
+bucket  = "your-terraform-state-bucket-staging"
+key     = "grafana/staging/terraform.tfstate"
+region  = "us-east-1"
+profile = "my-aws-profile-staging"

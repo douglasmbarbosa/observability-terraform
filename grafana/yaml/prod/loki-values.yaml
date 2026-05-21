@@ -1,0 +1,80 @@
+loki:
+  auth_enabled: false
+
+  limits_config:
+    retention_period: 2160h
+
+  compactor:
+    working_directory: /var/loki/compactor
+    retention_enabled: true
+    compaction_interval: 10m
+    retention_delete_delay: 2h
+    retention_delete_worker_count: 150
+    delete_request_store: s3
+
+  storage:
+    type: 's3'
+    bucketNames:
+      chunks: loki-chunks-${cluster_name}
+      ruler: loki-ruler-${cluster_name}
+      admin: loki-admin-${cluster_name}
+    s3:
+      region: ${aws_region}
+
+  schemaConfig:
+    configs:
+      - from: 2024-04-01
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+
+  ingester:
+    chunk_encoding: snappy
+
+  tracing:
+    enabled: true
+
+  querier:
+    max_concurrent: 4
+
+write:
+  replicas: 2
+  serviceAccount:
+    create: false
+    name: loki-service-account
+
+read:
+  replicas: 2
+  serviceAccount:
+    create: false
+    name: loki-service-account
+
+backend:
+  replicas: 2
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: gp3
+  serviceAccount:
+    create: false
+    name: loki-service-account
+
+resultsCache:
+  enabled: true
+  allocatedMemory: 512
+
+chunksCache:
+  enabled: true
+  allocatedMemory: 1024
+
+serviceAccount:
+  create: true
+  name: loki-service-account
+  annotations:
+    eks.amazonaws.com/role-arn: ${aws_iam_role_loki_arn}
+
+singleBinary:
+  replicas: 0

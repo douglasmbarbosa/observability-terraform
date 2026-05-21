@@ -1,0 +1,85 @@
+admin:
+  existingSecret: "grafana"
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: loki-prod
+      type: loki
+      url: http://loki-gateway.grafana.svc.cluster.local
+      access: proxy
+      isDefault: true
+    - name: loki-staging
+      type: loki
+      url: https://loki-staging.example.com
+      access: proxy
+      isDefault: false
+    - name: loki-dev
+      type: loki
+      url: https://loki-dev.example.com
+      access: proxy
+      isDefault: false
+    - name: prometheus-prod
+      type: prometheus
+      url: http://prometheus-server.prometheus.svc.cluster.local
+      access: proxy
+      isDefault: false
+    - name: prometheus-staging
+      type: prometheus
+      url: https://prometheus-staging.example.com
+      access: proxy
+      isDefault: false
+    - name: prometheus-dev
+      type: prometheus
+      url: https://prometheus-dev.example.com
+      access: proxy
+      isDefault: false
+
+persistence:
+  enabled: true
+  existingClaim: grafana-efs-pvc-prod
+
+initChownData:
+  enabled: false
+
+extraSecretMounts:
+  - name: grafana-db-credentials-mount
+    mountPath: /etc/grafana/secrets/database
+    secretName: grafana-db-credentials
+    readOnly: true
+
+grafana.ini:
+  database:
+    type: postgres
+    host: "${db_host}"
+    name: "grafana"
+    user: "$__file{/etc/grafana/secrets/database/GF_DATABASE_USER}"
+    password: "$__file{/etc/grafana/secrets/database/GF_DATABASE_PASSWORD}"
+    ssl_mode: "require"
+
+  server:
+    root_url: ${grafana_root_url}
+
+  smtp:
+    enabled: true
+    host: ${smtp_host}
+    from_address: ${smtp_from_address}
+    from_name: Grafana
+
+smtp:
+  existingSecret: "grafana-smtp"
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+serviceAccount:
+  create: true
+  name: grafana
+  annotations:
+    eks.amazonaws.com/role-arn: ${service_account_role_arn}
